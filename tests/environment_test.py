@@ -6,7 +6,7 @@ rng: np.random.Generator = np.random.default_rng()
 
 
 def environment_test() -> bool:
-    racetrack_ = environment.track.RaceTrack(environment.track.TRACK_1, rng)
+    racetrack_ = environment.track.GridWorld(environment.track.TRACK_1, rng)
     environment_ = environment.Environment(racetrack_)
 
     for state_ in environment_.states():

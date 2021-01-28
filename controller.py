@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import figure
 
-import enums
+import common
 import constants
 import environment
 import policy
@@ -16,7 +16,7 @@ class Controller:
         self.verbose: bool = verbose
 
         self.rng: np.random.Generator = np.random.default_rng()
-        self.racetrack = environment.track.RaceTrack(constants.TRACK, self.rng)
+        self.racetrack = environment.track.GridWorld(constants.TRACK, self.rng)
         self.environment = environment.Environment(self.racetrack, self.rng, verbose=False)
         self.target_policy: policy.DeterministicPolicy = policy.DeterministicPolicy(self.environment)
         self.behaviour_policy: policy.EGreedyPolicy = policy.EGreedyPolicy(self.environment, self.rng,
@@ -46,8 +46,8 @@ class Controller:
 
         while True:
             episode_: agent.Episode = self.target_agent.generate_episode()
-            user_event: enums.UserEvent = self.view.display_episode(episode_)
-            if user_event == enums.UserEvent.QUIT:
+            user_event: common.UserEvent = self.view.display_episode(episode_)
+            if user_event == common.UserEvent.QUIT:
                 break
 
     def output_q(self):

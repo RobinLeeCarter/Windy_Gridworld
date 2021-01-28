@@ -2,13 +2,13 @@ from typing import Generator
 import numpy as np
 
 import constants
-import enums
-from environment import action, response, state, track
+import common
+from environment import action, response, state, grid
 
 
 class Environment:
-    def __init__(self, racetrack_: track.RaceTrack, rng: np.random.Generator, verbose: bool = False):
-        self.racetrack: track.RaceTrack = racetrack_
+    def __init__(self, racetrack_: grid.GridWorld, rng: np.random.Generator, verbose: bool = False):
+        self.racetrack: grid.GridWorld = racetrack_
         self.rng: np.random.Generator = rng
         self.verbose: bool = verbose
 
@@ -32,7 +32,7 @@ class Environment:
 
         self.states_shape: tuple = (self.max_x + 1, self.max_y + 1, self.max_vx + 1, self.max_vy + 1)
         self.actions_shape: tuple = (self.max_ax - self.min_ax + 1, self.max_ay - self.min_ay + 1)
-        self.trace_ = track.Trace = track.Trace(self.racetrack)
+        self.trace_ = grid.Trace = grid.Trace(self.racetrack)
 
         # pre-reset state (if not None it means the state has just been reset and this was the failure state)
         # self.pre_reset_state: Optional[state.State] = None
@@ -98,14 +98,14 @@ class Environment:
         y = state_.y + vy
 
         square = self.racetrack.get_square(x, y)
-        if square == enums.Square.END:
+        if square == common.Square.END:
             # success
             reward = 0.0
             state_ = state.State(x, y, vx, vy, is_terminal=True)
             if self.verbose:
                 self.trace_.output()
                 print(f"Past finish line at {x}, {y}")
-        elif square == enums.Square.GRASS:
+        elif square == common.Square.GRASS:
             # failure, move back to start line
             # self.pre_reset_state = state.State(x, y, vx, vy, is_reset=True)
             reward = -1.0 + constants.EXTRA_REWARD_FOR_FAILURE

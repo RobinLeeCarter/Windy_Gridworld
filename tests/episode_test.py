@@ -8,7 +8,7 @@ rng: np.random.Generator = np.random.default_rng()
 
 
 def episode_test() -> bool:
-    racetrack_ = environment.track.RaceTrack(environment.track.TRACK_1, rng)
+    racetrack_ = environment.track.GridWorld(environment.track.TRACK_1, rng)
     environment_ = environment.Environment(racetrack_, verbose=True)
     policy_ = policy.RandomPolicy(environment_, rng)
     agent_ = agent.Agent(environment_, policy_, verbose=True)

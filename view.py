@@ -4,15 +4,15 @@ from typing import Optional, Dict
 import numpy as np
 import pygame
 
-import enums
-from environment import track
+import common
+from environment import grid
 import environment
 import agent
 
 
 class View:
-    def __init__(self, racetrack_: track.RaceTrack):
-        self.racetrack: track.RaceTrack = racetrack_
+    def __init__(self, racetrack_: grid.GridWorld):
+        self.racetrack: grid.GridWorld = racetrack_
 
         self.screen_width: int = 1500
         self.screen_height: int = 1000
@@ -22,9 +22,9 @@ class View:
         self.track_surface: Optional[pygame.Surface] = None
 
         self.background_color: pygame.Color = pygame.Color('grey10')
-        self.color_lookup: Dict[enums.Square, pygame.Color] = {}
+        self.color_lookup: Dict[common.Square, pygame.Color] = {}
 
-        self.user_event: enums.UserEvent = enums.UserEvent.NONE
+        self.user_event: common.UserEvent = common.UserEvent.NONE
 
         self.t: int = 0
         self.episode: Optional[agent.Episode] = None
@@ -39,11 +39,11 @@ class View:
     # noinspection SpellCheckingInspection
     def build_color_lookup(self):
         self.color_lookup = {
-            enums.Square.TRACK: pygame.Color('darkgrey'),
-            enums.Square.GRASS: pygame.Color('forestgreen'),
-            enums.Square.START: pygame.Color('yellow2'),
-            enums.Square.END: pygame.Color('goldenrod2'),
-            enums.Square.CAR: pygame.Color('deepskyblue2')
+            common.Square.TRACK: pygame.Color('darkgrey'),
+            common.Square.GRASS: pygame.Color('forestgreen'),
+            common.Square.START: pygame.Color('yellow2'),
+            common.Square.END: pygame.Color('goldenrod2'),
+            common.Square.CAR: pygame.Color('deepskyblue2')
         }
 
     def load_racetrack(self):
@@ -51,7 +51,7 @@ class View:
         self.track_surface.fill(self.background_color)
         for index, track_value in np.ndenumerate(self.racetrack.track):
             row, col = index
-            square = enums.Square(track_value)
+            square = common.Square(track_value)
             self.draw_square(row, col, square, self.track_surface)
         self.copy_track_into_background()
 
@@ -68,7 +68,7 @@ class View:
         self.background = pygame.Surface(size=self.screen_size)
         self.track_surface = pygame.Surface(size=self.screen_size)
 
-    def draw_square(self, row: int, col: int, square: enums.Square, surface: pygame.Surface) -> pygame.Rect:
+    def draw_square(self, row: int, col: int, square: common.Square, surface: pygame.Surface) -> pygame.Rect:
         color: pygame.Color = self.color_lookup[square]
         left: int = col * self.cell_pixels
         top: int = row * self.cell_pixels
@@ -90,7 +90,7 @@ class View:
         # self.background.fill(self.background_color)
 
     def display_and_wait(self):
-        while self.user_event != enums.UserEvent.QUIT:
+        while self.user_event != common.UserEvent.QUIT:
             self.put_background_on_screen()
             # keys = pygame.key.get_pressed()
             # if keys[pygame.K_SPACE]:
@@ -99,7 +99,7 @@ class View:
             self.wait_for_event_of_interest()
             self.handle_event()
 
-    def display_episode(self, episode_: agent.Episode) -> enums.UserEvent:
+    def display_episode(self, episode_: agent.Episode) -> common.UserEvent:
         # print(episode_.trajectory)
         # print(f"len(self.episode.trajectory) = {len(episode_.trajectory)}")
         self.copy_track_into_background()
@@ -107,7 +107,7 @@ class View:
         self.episode = episode_
         self.t = 0
         terminal = len(self.episode.trajectory) - 1  # terminal state
-        while self.user_event != enums.UserEvent.QUIT and self.t <= terminal:
+        while self.user_event != common.UserEvent.QUIT and self.t <= terminal:
             # need to pass through for terminal state to display penultimate state
             # keys = pygame.key.get_pressed()
             # if keys[pygame.K_SPACE]:
@@ -122,14 +122,14 @@ class View:
         pygame.display.flip()
 
     def wait_for_event_of_interest(self):
-        self.user_event = enums.UserEvent.NONE
-        while self.user_event == enums.UserEvent.NONE:
+        self.user_event = common.UserEvent.NONE
+        while self.user_event == common.UserEvent.NONE:
             # replaced: for event in pygame.event.get():
             event = pygame.event.wait()
             if event.type == pygame.QUIT:
-                self.user_event = enums.UserEvent.QUIT
+                self.user_event = common.UserEvent.QUIT
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                self.user_event = enums.UserEvent.SPACE
+                self.user_event = common.UserEvent.SPACE
             # else:
             #     keys = pygame.key.get_pressed()
             #     if keys[pygame.K_SPACE]:
@@ -153,10 +153,10 @@ class View:
             #     print("up")
 
     def handle_event(self):
-        if self.user_event == enums.UserEvent.QUIT:
+        if self.user_event == common.UserEvent.QUIT:
             self.close_window()
             # sys.exit()
-        elif self.user_event == enums.UserEvent.SPACE:
+        elif self.user_event == common.UserEvent.SPACE:
             state: environment.State = self.episode.trajectory[self.t].state
             if not state.is_terminal:
                 self.draw_car_at_state(state)
@@ -166,7 +166,7 @@ class View:
     def draw_car_at_state(self, state: environment.State):
         row, col = self.racetrack.get_index(state.x, state.y)
         # print(f"t={self.t} x={state.x} y={state.y} row={row} col={col}")
-        rect: pygame.Rect = self.draw_square(row, col, enums.Square.CAR, self.background)
+        rect: pygame.Rect = self.draw_square(row, col, common.Square.CAR, self.background)
         self.screen.blit(source=self.background, dest=rect, area=rect)
         pygame.display.update(rect)
         # self.screen.blit(source=self.background, dest=(0, 0))
@@ -182,7 +182,7 @@ class View:
         # print(flat_index)
         # row, col = np.unravel_index(flat_index, self.track.shape)
         # print(row, col)
-        self.draw_square(row, col, enums.Square.CAR, self.background)
+        self.draw_square(row, col, common.Square.CAR, self.background)
 
     def close_window(self):
         # pygame.display.quit()

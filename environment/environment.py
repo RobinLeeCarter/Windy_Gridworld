@@ -41,7 +41,9 @@ class Environment:
         """set S"""
         for x in range(self.states_shape[0]):
             for y in range(self.states_shape[1]):
-                yield state.State(position=common.XY(x=x, y=y))
+                position = common.XY(x=x, y=y)
+                is_terminal: bool = self.grid_world.is_at_goal(position)
+                yield state.State(position, is_terminal)
 
     def actions(self) -> Generator[action.Action, None, None]:
         """set A - same for all s"""
@@ -103,13 +105,13 @@ class Environment:
             x=state_.position.x + combined.x,
             y=state_.position.y + combined.y
         )
-        projected_position: common.XY = self.project_back_to_grid(blown_position)
+        projected_position: common.XY = self._project_back_to_grid(blown_position)
         is_terminal: bool = self.grid_world.is_at_goal(projected_position)
         new_state: state.State = state.State(projected_position, is_terminal)
         reward: float = -1.0
         return response.Response(new_state, reward)
 
-    def project_back_to_grid(self, blown_position: common.XY) -> common.XY:
+    def _project_back_to_grid(self, blown_position: common.XY) -> common.XY:
         x = blown_position.x
         y = blown_position.y
         if x < 0:

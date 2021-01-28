@@ -1,13 +1,15 @@
 import numpy as np
 
+import common
 import environment
+import data
+
 
 rng: np.random.Generator = np.random.default_rng()
 
 
 def environment_test() -> bool:
-    racetrack_ = environment.track.GridWorld(environment.track.TRACK_1, rng)
-    environment_ = environment.Environment(racetrack_)
+    environment_ = environment.Environment(grid_=data.GRID_1, rng=rng)
 
     for state_ in environment_.states():
         print(state_)
@@ -19,10 +21,11 @@ def environment_test() -> bool:
 
     print()
 
-    state_ = environment.State(0, 0, vx=0, vy=4)
-    print(state_)
-    for action_ in environment_.actions_for_state(state_):
-        print(action_)
+    state_ = environment.State(common.XY(x=4, y=2))
+    action_ = environment.Action(common.XY(x=1, y=0))
+    response_ = environment_.apply_action_to_state(state_, action_)
+    print(state_, action_)
+    print(response_)
 
     return True
 

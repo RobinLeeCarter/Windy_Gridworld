@@ -7,8 +7,8 @@ class Policy(abc.ABC):
     def __init__(self, environment_: environment.Environment):
         self.environment = environment_
 
-    def get_next_action(self) -> environment.Action:
-        return self.get_action_given_state(self.environment.state)
+    # def get_next_action(self) -> environment.Action:
+    #     return self.get_action_given_state(self.environment.state)
 
     @abc.abstractmethod
     def get_action_given_state(self, state_: environment.State) -> environment.Action:

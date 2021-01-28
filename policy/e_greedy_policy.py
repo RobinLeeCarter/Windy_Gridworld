@@ -8,17 +8,19 @@ import policy
 
 class EGreedyPolicy(policy.RandomPolicy):
     def __init__(self, environment_: environment.Environment, rng: np.random.Generator,
-                 greedy_policy: policy.Policy, epsilon: float = 0.1):
+                 greedy_policy: policy.DeterministicPolicy, epsilon: float = 0.1):
         super().__init__(environment_, rng)
-        self.greedy_policy: policy.Policy = greedy_policy
+        self.greedy_policy: policy.DeterministicPolicy = greedy_policy
         self.epsilon = epsilon
 
     def get_action_given_state(self, state_: environment.State) -> environment.Action:
         if self.rng.uniform() > self.epsilon:
             return self.greedy_policy.get_action_given_state(state_)
         else:
-            self.set_possible_actions(state_)
-            return self.rng.choice(self.possible_actions)
+            return policy.RandomPolicy.get_action_given_state(self, state_)
+            # policy.RandomPolicy.get_action_given_state(self, state_)
+            # self.set_possible_actions(state_)
+            # return self.rng.choice(self.possible_actions)
 
     def get_probability(self, state_: environment.State, action_: environment.Action) -> float:
         self.set_possible_actions(state_)

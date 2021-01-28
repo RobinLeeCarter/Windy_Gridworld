@@ -9,13 +9,10 @@ class Action:
     # move before wind
     move: common.XY
 
-    # @property
-    # def index(self) -> tuple:
-    #     # ax = ix - constants.MAX_ACCELERATION
-    #     # ay = constants.MAX_ACCELERATION - iy
-    #     ix = self.ax - constants.MIN_ACCELERATION
-    #     iy = self.ay - constants.MIN_ACCELERATION
-    #     return ix, iy
+    @property
+    def index(self) -> int:
+        from environment import actions
+        return actions.Actions.get_index_from_action(self)
 
     # @staticmethod
     # def get_action_from_index(index: tuple) -> Action:

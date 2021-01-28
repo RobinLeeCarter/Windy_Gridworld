@@ -13,9 +13,11 @@ def grid_test() -> bool:
     shape = grid_.max_y + 1, grid_.max_x + 1
     wind_grid = np.empty(shape=shape, dtype=int)
     for iy, ix in np.ndindex(wind_grid.shape):
-        x: int = ix
-        y: int = grid_.max_y - iy
-        wind: common.XY = grid_world_.get_wind(x, y)
+        position: common.XY = common.XY(
+            x=ix,
+            y=grid_.max_y - iy
+        )
+        wind: common.XY = grid_world_.get_wind(position)
         wind_grid[iy, ix] = wind.y
 
     print(wind_grid)

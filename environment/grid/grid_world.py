@@ -16,5 +16,5 @@ class GridWorld:
         return grid_position == self.grid.goal
 
     # noinspection PyUnusedLocal
-    def get_wind(self, x: int, y: int) -> common.XY:
-        return common.XY(x=0, y=self.grid.upward_wind[x])
+    def get_wind(self, position: common.XY) -> common.XY:
+        return common.XY(x=0, y=self.grid.upward_wind[position.x])

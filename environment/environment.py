@@ -3,6 +3,7 @@ import numpy as np
 
 import common
 from environment import action, response, state, grid
+import action_explore
 
 
 class Environment:
@@ -10,6 +11,8 @@ class Environment:
         self.rng: np.random.Generator = rng
         self.verbose: bool = verbose
         self.grid_world: grid.GridWorld = grid.GridWorld(grid_, rng)
+        a = action_explore.Actions._test_action
+        b = action_explore._test_action2
 
         # position
         self.min_x: int = 0

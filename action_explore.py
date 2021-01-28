@@ -34,6 +34,7 @@ class Actions:
     ]
     actions_shape = (len(action_list), )
     action_dict = {action_: i for i, action_ in enumerate(action_list)}
+    _test_action = Action(common.XY(-1, 0))
 
     @staticmethod
     def get_action_from_index(index: int) -> Action:
@@ -42,3 +43,6 @@ class Actions:
     @staticmethod
     def get_index_from_action(action_: Action) -> int:
         return Actions.action_dict[action_]
+
+
+_test_action2 = Action(common.XY(+1, 0))

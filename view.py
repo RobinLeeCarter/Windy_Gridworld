@@ -39,11 +39,11 @@ class View:
     # noinspection SpellCheckingInspection
     def build_color_lookup(self):
         self.color_lookup = {
-            common.Square.TRACK: pygame.Color('darkgrey'),
-            common.Square.GRASS: pygame.Color('forestgreen'),
+            common.Square.NORMAL: pygame.Color('darkgrey'),
+            common.Square.OBSTACLE: pygame.Color('forestgreen'),
             common.Square.START: pygame.Color('yellow2'),
             common.Square.END: pygame.Color('goldenrod2'),
-            common.Square.CAR: pygame.Color('deepskyblue2')
+            common.Square.AGENT: pygame.Color('deepskyblue2')
         }
 
     def load_racetrack(self):
@@ -166,7 +166,7 @@ class View:
     def draw_car_at_state(self, state: environment.State):
         row, col = self.racetrack.get_index(state.x, state.y)
         # print(f"t={self.t} x={state.x} y={state.y} row={row} col={col}")
-        rect: pygame.Rect = self.draw_square(row, col, common.Square.CAR, self.background)
+        rect: pygame.Rect = self.draw_square(row, col, common.Square.AGENT, self.background)
         self.screen.blit(source=self.background, dest=rect, area=rect)
         pygame.display.update(rect)
         # self.screen.blit(source=self.background, dest=(0, 0))
@@ -182,7 +182,7 @@ class View:
         # print(flat_index)
         # row, col = np.unravel_index(flat_index, self.track.shape)
         # print(row, col)
-        self.draw_square(row, col, common.Square.CAR, self.background)
+        self.draw_square(row, col, common.Square.AGENT, self.background)
 
     def close_window(self):
         # pygame.display.quit()

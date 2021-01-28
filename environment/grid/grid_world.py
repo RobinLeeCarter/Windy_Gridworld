@@ -18,3 +18,11 @@ class GridWorld:
     # noinspection PyUnusedLocal
     def get_wind(self, position: common.XY) -> common.XY:
         return common.XY(x=0, y=self.grid.upward_wind[position.x])
+
+    def get_square(self, position: common.XY) -> common.Square:
+        if position == self.grid.start:
+            return common.Square.START
+        elif position == self.grid.goal:
+            return common.Square.END
+        else:
+            return common.Square.NORMAL

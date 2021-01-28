@@ -1,18 +1,13 @@
-import numpy as np
 from data import grids
+from environment import grid
 
-MIN_VELOCITY: int = 0
-MAX_VELOCITY: int = 4
+GRID: grid.Grid = grids.GRID_1
 
-MIN_ACCELERATION: int = -1
-MAX_ACCELERATION: int = +1
-
-TRACK: np.ndarray = grids.TRACK_2
-
-INITIAL_Q_VALUE: float = -40.0
-EXTRA_REWARD_FOR_FAILURE: float = -40.0   # 0.0 for problem statement
-
-SKID_PROBABILITY: float = 0.1   # 0.1 for problem statement
+ALPHA: float = 0.5
+INITIAL_Q_VALUE: float = 0.0
+# for deletion
+EXTRA_REWARD_FOR_FAILURE: float = 0.0
+SKID_PROBABILITY: float = 0.0
 
 LEARNING_EPISODES: int = 100_000
 PERFORMANCE_SAMPLE_START: int = 1000

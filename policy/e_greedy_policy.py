@@ -13,6 +13,9 @@ class EGreedyPolicy(policy.RandomPolicy):
         self.greedy_policy: policy.DeterministicPolicy = greedy_policy
         self.epsilon = epsilon
 
+    def set_greedy_action(self, state_: environment.State, action_: environment.Action):
+        self.greedy_policy.set_action(state_, action_)
+
     def get_action_given_state(self, state_: environment.State) -> environment.Action:
         if self.rng.uniform() > self.epsilon:
             return self.greedy_policy.get_action_given_state(state_)

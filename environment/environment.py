@@ -1,4 +1,4 @@
-from typing import Generator
+from typing import Generator, Dict, List
 import numpy as np
 
 import common
@@ -30,7 +30,10 @@ class Environment:
         # self.max_ay: int = constants.MAX_ACCELERATION
 
         self.states_shape: tuple = (self.max_x + 1, self.max_y + 1)
-        # self.actions_shape: tuple = (self.max_ax - self.min_ax + 1, self.max_ay - self.min_ay + 1)
+        self.action_list: List[action.Action] = [action_ for action_ in self.actions()]
+        self.action_dict: Dict[action.Action, int] = {action_: i for i, action_ in enumerate(self.actions())}
+        # actions = [action_ for action_ in self.actions()]
+        self.actions_shape: tuple = (len(self.action_dict), )
         # self.trace_ = grid.Trace = grid.Trace(self.grid_world)
 
         # pre-reset state (if not None it means the state has just been reset and this was the failure state)
@@ -56,12 +59,13 @@ class Environment:
         # down
         yield action.Action(move=common.XY(x=0, y=-1))
 
-        # for iy in range(self.actions_shape[0]):
-        #     for ix in range(self.actions_shape[1]):
-        #         yield action.Action.get_action_from_index((iy, ix))
+    def get_index_from_action(self, action_: action.Action) -> tuple[int]:
+        tuple_index = (self.action_dict[action_], )
+        return tuple_index
 
-    # def current_actions(self) -> Generator[action.Action, None, None]:
-    #     yield from self.actions_for_state(self.state)
+    def get_action_from_index(self, index: int) -> action.Action:
+        action_ = self.action_list[index]
+        return action_
 
     # possible need to materialise this if it's slow since it will be at the bottom of the loop
     def actions_for_state(self, state_: state.State) -> Generator[action.Action, None, None]:

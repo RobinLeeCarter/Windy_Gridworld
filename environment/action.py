@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import common
 
 
-@dataclass
+@dataclass(frozen=True)
 class Action:
     # move before wind
     move: common.XY

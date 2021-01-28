@@ -12,6 +12,14 @@ XY = namedtuple('XY', ['x', 'y'])
 #     y: int
 
 
+class Square(enum.IntEnum):
+    NORMAL = 0
+    OBSTACLE = 1
+    START = 2
+    END = 3
+    AGENT = 4
+
+
 class UserEvent(enum.IntEnum):
     NONE = 0
     QUIT = 1

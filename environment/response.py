@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from environment import state
 
 
-@dataclass
+@dataclass(frozen=True)
 class Response:
     reward: float
     state: state.State

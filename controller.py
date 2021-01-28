@@ -7,7 +7,7 @@ import constants
 import environment
 import policy
 import agent
-import off_policy_mc_control
+import on_policy_td_control
 import view
 
 
@@ -16,22 +16,26 @@ class Controller:
         self.verbose: bool = verbose
 
         self.rng: np.random.Generator = np.random.default_rng()
-        self.racetrack = environment.track.GridWorld(constants.TRACK, self.rng)
-        self.environment = environment.Environment(self.racetrack, self.rng, verbose=False)
-        self.target_policy: policy.DeterministicPolicy = policy.DeterministicPolicy(self.environment)
-        self.behaviour_policy: policy.EGreedyPolicy = policy.EGreedyPolicy(self.environment, self.rng,
-                                                                           greedy_policy=self.target_policy)
-        # self.behaviour_policy: policy.RandomPolicy = policy.RandomPolicy(self.environment, self.rng)
-        self.target_agent = agent.Agent(self.environment, self.target_policy)
-        self.behaviour_agent = agent.Agent(self.environment, self.behaviour_policy)
+        self.environment = environment.Environment(constants.GRID, self.rng, verbose=True)
+        self.greedy_policy: policy.DeterministicPolicy = policy.DeterministicPolicy(self.environment)
+        self.e_greedy_policy: policy.EGreedyPolicy = policy.EGreedyPolicy(self.environment, self.rng,
+                                                                          greedy_policy=self.greedy_policy)
+        self.agent = agent.Agent(self.environment, self.e_greedy_policy)
 
-        self.algorithm_: off_policy_mc_control.OffPolicyMcControl = off_policy_mc_control.OffPolicyMcControl(
+        # self.target_policy: policy.DeterministicPolicy = policy.DeterministicPolicy(self.environment)
+        # self.behaviour_policy: policy.EGreedyPolicy = policy.EGreedyPolicy(self.environment, self.rng,
+        #                                                                    greedy_policy=self.target_policy)
+        # self.behaviour_policy: policy.RandomPolicy = policy.RandomPolicy(self.environment, self.rng)
+        # self.target_agent = agent.Agent(self.environment, self.target_policy)
+        # self.behaviour_agent = agent.Agent(self.environment, self.behaviour_policy)
+
+        self.algorithm_: on_policy_td_control.OnPolicyTdControl = on_policy_td_control.OnPolicyTdControl(
                 self.environment,
-                self.target_agent,
-                self.behaviour_agent,
+                self.agent,
+                alpha=constants.ALPHA,
                 verbose=self.verbose
             )
-        self.view = view.View(self.racetrack)
+        self.view = view.View(self.environment.grid_world)
 
     def run(self):
         self.algorithm_.run()

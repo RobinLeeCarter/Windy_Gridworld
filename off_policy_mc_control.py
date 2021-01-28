@@ -72,7 +72,7 @@ class OffPolicyMcControl:
                 self.sample_target()
 
             episode: agent.Episode = self.behaviour_agent.generate_episode()
-            trajectory: List[agent.RewardStateAction] = episode.trajectory
+            trajectory: List[agent.RSA] = episode.trajectory
             G: float = 0.0
             W: float = 1.0
             # reversed_non_terminated = reversed(trajectory_.episode[:-1])

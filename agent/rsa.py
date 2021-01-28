@@ -5,7 +5,7 @@ import environment
 
 
 @dataclass
-class RewardStateAction:
+class RSA:
     reward: Optional[float]
     state: Optional[environment.State]
     action: Optional[environment.Action]

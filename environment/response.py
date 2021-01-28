@@ -6,5 +6,5 @@ from environment import state
 
 @dataclass
 class Response:
-    state: state.State
     reward: float
+    state: state.State

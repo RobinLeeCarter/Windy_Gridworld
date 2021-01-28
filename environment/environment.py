@@ -109,7 +109,7 @@ class Environment:
         is_terminal: bool = self.grid_world.is_at_goal(projected_position)
         new_state: state.State = state.State(projected_position, is_terminal)
         reward: float = -1.0
-        return response.Response(new_state, reward)
+        return response.Response(reward, new_state)
 
     def _project_back_to_grid(self, blown_position: common.XY) -> common.XY:
         x = blown_position.x

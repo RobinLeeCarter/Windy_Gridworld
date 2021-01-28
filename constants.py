@@ -1,5 +1,5 @@
 import numpy as np
-from environment.grid import grids
+from data import grids
 
 MIN_VELOCITY: int = 0
 MAX_VELOCITY: int = 4

@@ -1,14 +1,15 @@
 import numpy as np
 
-import view
 from environment import grid
+import constants
+import view
 
 rng: np.random.Generator = np.random.default_rng()
 
 
 def view_test() -> bool:
-    racetrack_ = grid.GridWorld(grid.TRACK_3, rng)
-    my_view = view.View(racetrack_)
+    grid_world = grid.GridWorld(constants.GRID, rng)
+    my_view = view.View(grid_world)
     my_view.open_window()
     my_view.display_and_wait()
 

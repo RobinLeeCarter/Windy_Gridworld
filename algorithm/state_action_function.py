@@ -31,12 +31,15 @@ class StateActionFunction:
                 else:
                     self._values[q_index] = constants.INITIAL_Q_VALUE
 
-    def __getitem__(self, key: tuple[environment.State, environment.Action]):
-        state, action = key
-        return self._values[state.index + action.index]
+    def __getitem__(self, state_action: tuple[environment.State, environment.Action]) -> float:
+        state, action = state_action
+        if state.is_terminal or action is None:
+            return 0.0
+        else:
+            return self._values[state.index + action.index]
 
-    def __setitem__(self, key: tuple[environment.State, environment.Action], value: float):
-        state, action = key
+    def __setitem__(self, state_action: tuple[environment.State, environment.Action], value: float):
+        state, action = state_action
         self._values[state.index + action.index] = value
 
     # def get_value(self, state: environment.State, action: environment.Action) -> float:
@@ -61,12 +64,18 @@ class StateActionFunction:
         # best_flat_indexes: np.ndarray = np.flatnonzero(best_q_bool)
         # best_flat_indexes: np.ndarray = np.argmax(q_state)
         # consistent_best_flat_index: int = best_flat_indexes[0]
-
-        consistent_best_flat_index: int = np.argmax(q_state)[0]
+        # consistent_best_flat_index: int = np.argmax(q_state)
         # print(f"consistent_best_flat_index {consistent_best_flat_index}")
-        best_index_np: tuple[np.ndarray] = np.unravel_index(consistent_best_flat_index, shape=q_state.shape)
-        # best_index_np actually returns tuple[np.int64]
-        # assert np.isscalar(best_index_np[0])
+
+        # https://numpy.org/doc/stable/reference/generated/numpy.argmax.html
+        # In case of multiple occurrences of the maximum values,
+        # the indices corresponding to the first occurrence are returned
+
+        # best_flat_index_np is just an int but can't be typed as such
+        best_flat_index_np: np.ndarray = np.argmax(q_state)
+        # best_index_np is actually tuple[np.int64] but can't be typed as such
+        best_index_np: tuple[np.ndarray] = np.unravel_index(best_flat_index_np, shape=q_state.shape)
+        # assert np.isscalar(best_index_np[0]) - could assert but don't need to
         best_index: tuple = tuple(int(i) for i in best_index_np)
 
         # best_index_np: tuple = best_index_tuple_array[0][0]
@@ -76,3 +85,8 @@ class StateActionFunction:
         # print(f"best_action {best_action}")
         return best_action
 
+    def print_coverage_statistics(self):
+        q_size = self._values.size
+        q_non_zero = np.count_nonzero(self._values)
+        percent_non_zero = 100.0 * q_non_zero / q_size
+        print(f"q_size: {q_size}\tq_non_zero: {q_non_zero}\tpercent_non_zero: {percent_non_zero:.2f}")

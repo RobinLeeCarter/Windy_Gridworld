@@ -26,14 +26,16 @@ class Agent:
         """Gets initial state S0.
         Choose initial action A0.
         Records S0 and A0 but does not take action."""
-        self.t = 0
         if self.verbose:
             print("start episode...")
         self.episode = episode.Episode()
+        self.t = 0
+        # self.reward = None
         self.previous_rsa = None
         # start
         self.response = self.environment.start()
         self._update_from_response()
+        # special case at start
         self._add_episode_rsa()
 
     def take_action(self):
@@ -56,15 +58,14 @@ class Agent:
         sarsa_ = sarsa.Sarsa(
             state=self.previous_rsa.state,
             action=self.previous_rsa.action,
-            reward=self.previous_rsa.reward,
+            reward=self.reward,
             next_state=self.state,
             next_action=self.action
         )
         return sarsa_
 
     def _add_episode_rsa(self):
-        self.episode.set_rsa(reward=self.reward, state=self.state, action=self.action)
-        self.episode.add_rsa()
+        self.episode.add_rsa(reward=self.reward, state=self.state, action=self.action)
 
     def _update_from_response(self):
         self.t += 1
@@ -79,18 +80,28 @@ class Agent:
             print(f"state = {self.state} \t action = {self.action}")
 
     def generate_episode(self) -> episode.Episode:
-        episode_: episode.Episode = episode.Episode()
-        # start
-        response = self.environment.start()
-        self.state = response.state
-
-        while not self.state.is_terminal:
-            self.action = self.policy[self.state]
+        self.start_episode()
+        while not self.state.is_terminal and self.t <= 10000:
             if self.verbose:
-                print(f"state = {self.state} \t action = {self.action}")
-            self.response = self.environment.from_state_perform_action(self.state, self.action)
-            episode_.add_monte_carlo_style(self.state, self.action, self.response.reward)
-            self.state = self.response.state
-        episode_.add_terminal(self.state)
+                print(f"t={self.t} \t state = {self.state} \t action = {self.action}")
+            self.take_action()
+        if self.verbose:
+            print(f"t={self.t} \t state = {self.state} (terminal)")
+        return self.episode
 
-        return episode_
+    # def generate_episode(self) -> episode.Episode:
+    #     episode_: episode.Episode = episode.Episode()
+    #     # start
+    #     response = self.environment.start()
+    #     self.state = response.state
+    #
+    #     while not self.state.is_terminal:
+    #         self.action = self.policy[self.state]
+    #         if self.verbose:
+    #             print(f"state = {self.state} \t action = {self.action}")
+    #         self.response = self.environment.from_state_perform_action(self.state, self.action)
+    #         episode_.add_monte_carlo_style(self.state, self.action, self.response.reward)
+    #         self.state = self.response.state
+    #     episode_.add_terminal(self.state)
+    #
+    #     return episode_

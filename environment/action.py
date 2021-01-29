@@ -18,13 +18,13 @@ class Action:
 class Actions:
     action_list = [
         # left
-        Action(move=(-1, 0)),
+        Action(move=common.XY(-1, 0)),
         # right
-        Action(move=(1, 0)),
+        Action(move=common.XY(1, 0)),
         # up
-        Action(move=(0, +1)),
+        Action(move=common.XY(0, +1)),
         # down
-        Action(move=(0, -1))
+        Action(move=common.XY(0, -1))
     ]
     shape = (len(action_list),)
     _action_to_index = {action_: i for i, action_ in enumerate(action_list)}

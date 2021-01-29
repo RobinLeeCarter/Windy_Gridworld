@@ -73,7 +73,7 @@ class Environment:
         state_ = self.get_a_start_state()
         # if self.verbose:
         #     self.trace_.start(state_)
-        return response.Response(state=state_, reward=0.0)
+        return response.Response(state=state_, reward=None)
 
     def get_a_start_state(self) -> state.State:
         position: common.XY = self.grid_world.get_a_start_position()

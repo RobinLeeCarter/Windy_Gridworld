@@ -18,6 +18,7 @@ class View:
 
         self.screen_width: int = 1500
         self.screen_height: int = 1000
+        self.title: str = "Windy Gridworld on-policy TD(0) control a.k.a. SARSA"
         self._cell_pixels: int = 10
         self._screen: Optional[pygame.Surface] = None
         self._background: Optional[pygame.Surface] = None
@@ -40,7 +41,7 @@ class View:
 
     def open_window(self):
         self._screen = pygame.display.set_mode(size=self.screen_size)
-        pygame.display.set_caption('Gridworld finite MDP control TD(0) aka SARSA')
+        pygame.display.set_caption(self.title)
         # self.background = pygame.Surface(size=self.screen_size).convert()
         self._background = self._background.convert()
         self._grid_surface = self._grid_surface.convert()

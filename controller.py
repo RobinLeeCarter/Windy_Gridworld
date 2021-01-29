@@ -33,14 +33,15 @@ class Controller:
                 self.environment,
                 self.agent,
                 alpha=constants.ALPHA,
-                verbose=False
+                verbose=True
             )
         self.view = view.View(self.environment.grid_world)
 
     def run(self):
         self.algorithm_.run()
-        self.output_q()
-        self.graph_samples(self.algorithm_.sample_iteration, self.algorithm_.average_return)
+        self.algorithm_.Q.print_coverage_statistics()
+        # self.output_q()
+        # self.graph_samples(self.algorithm_.sample_iteration, self.algorithm_.average_return)
 
         # self.behaviour_agent.set_policy(self.target_policy)
         self.view.open_window()
@@ -48,18 +49,19 @@ class Controller:
         # self.environment.verbose = True
         # self.agent.verbose = True
 
+        self.agent.verbose = True
         while True:
-            episode_: agent.Episode = self.target_agent.generate_episode()
+            episode_: agent.Episode = self.agent.generate_episode()
             user_event: common.UserEvent = self.view.display_episode(episode_)
             if user_event == common.UserEvent.QUIT:
                 break
 
-    def output_q(self):
-        q = self.algorithm_.Q
-        q_size = q.size
-        q_non_zero = np.count_nonzero(q)
-        percent_non_zero = 100.0 * q_non_zero / q_size
-        print(f"q_size: {q_size}\tq_non_zero: {q_non_zero}\tpercent_non_zero: {percent_non_zero:.2f}")
+    # def output_q(self):
+    #     q = self.algorithm_.Q
+    #     q_size = q.size
+    #     q_non_zero = np.count_nonzero(q)
+    #     percent_non_zero = 100.0 * q_non_zero / q_size
+    #     print(f"q_size: {q_size}\tq_non_zero: {q_non_zero}\tpercent_non_zero: {percent_non_zero:.2f}")
 
     def graph_samples(self, iteration: np.ndarray, average_return: np.ndarray):
         fig: figure.Figure = plt.figure()

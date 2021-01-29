@@ -13,7 +13,7 @@ class StateActionFunction:
         self._environment: environment.Environment = environment_
         self._shape = self._environment.states_shape + self._environment.actions_shape
         self._values: np.ndarray = np.empty(shape=self._shape, dtype=float)
-        # self._actions_slice is used by state_argmax so cached here
+        # self._actions_slice is used by argmax_over_actions so cached here
         all_slice: slice = np.s_[:]
         self._actions_slice: tuple[slice] = tuple(itertools.repeat(all_slice, len(self._environment.actions_shape)))
 
@@ -45,7 +45,7 @@ class StateActionFunction:
     # def set_value(self, state: environment.State, action: environment.Action, value: float):
     #     self._q_values[state.index + action.index] = value
 
-    def state_argmax(self, state: environment.State) -> environment.Action:
+    def argmax_over_actions(self, state: environment.State) -> environment.Action:
         """set target_policy to argmax over a of Q breaking ties consistently"""
         # state_index = self.get_index_from_state(state_)
         # print(f"state_index {state_index}")

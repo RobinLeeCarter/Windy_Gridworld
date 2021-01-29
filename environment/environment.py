@@ -1,4 +1,4 @@
-from typing import Generator, Dict, List
+from typing import Generator
 import numpy as np
 
 import common
@@ -79,9 +79,9 @@ class Environment:
         position: common.XY = self.grid_world.get_a_start_position()
         return state.State(position)
 
-    def apply_action_to_state(self, state_: state.State, action_: action.Action) -> response.Response:
+    def from_state_perform_action(self, state_: state.State, action_: action.Action) -> response.Response:
         # if not self.is_action_compatible_with_state(state_, action_):
-        #     raise Exception(f"apply_action_to_state state {state_} incompatible with action {action_}")
+        #     raise Exception(f"from_state_perform_action state {state_} incompatible with action {action_}")
 
         wind: common.XY = self.grid_world.get_wind(state_.position)
         combined: common.XY = common.XY(

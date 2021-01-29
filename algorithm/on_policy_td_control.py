@@ -36,9 +36,9 @@ class OnPolicyTdControl:
 
     def initialise_policy(self):
         for state_ in self.environment.states():
-            # self.policy[state_] = self.Q.state_argmax(state_)
-            target_action = self.Q.state_argmax(state_)
-            self.policy.set_greedy_action(state_, target_action)
+            # self.policy[state_] = self.Q.argmax_over_actions(state_)
+            target_action = self.Q.argmax_over_actions(state_)
+            self.policy[state_] = target_action
 
     # noinspection PyPep8Naming
     def run(self):
@@ -53,30 +53,14 @@ class OnPolicyTdControl:
             #         self.learning_iteration % constants.PERFORMANCE_SAMPLE_FREQUENCY == 0:
             #     self.sample_target()
 
-            episode: agent.Episode = self.behaviour_agent.generate_episode()
-            trajectory: List[agent.RSA] = episode.trajectory
-            G: float = 0.0
-            W: float = 1.0
-            # reversed_non_terminated = reversed(trajectory_.episode[:-1])
-            T: int = len(trajectory) - 1
-            # print(f"T = {T}")
-            for t in reversed(range(T)):
-                # if t < T-1:
-                #     print(f"t = {t}")
-                R_t_plus_1 = trajectory[t+1].reward
-                S_t = trajectory[t].state
-                A_t = trajectory[t].action
-                G = self.gamma * G + R_t_plus_1
-                s_a = S_t.index + A_t.index
-                # print(f"s_a = {s_a}")
-                self.C[s_a] += W
-                self.Q[s_a] += (W / self.C[s_a]) * (G - self.Q[s_a])
-                target_action = self.consistent_argmax_q(S_t)
-                self.target_policy.set_action(S_t, target_action)
-                # print(f"S_t={S_t} -> new_a={target_action}")
-                if A_t.index != target_action.index:
-                    break
-                W /= self.behaviour_agent.policy.get_probability(S_t, A_t)
+            self.agent.start_episode()
+            while not self.agent.state.is_terminal and self.agent.t <= 10000:
+                self.agent.take_action()
+                sarsa = self.agent.get_sarsa()
+                delta = sarsa.reward + \
+                    self.gamma * self.Q[sarsa.next_state, sarsa.next_action] - \
+                    self.Q[sarsa.state, sarsa.action]
+                self.Q[sarsa.state, sarsa.action] += self.alpha * delta
             self.learning_iteration += 1
 
         # print(self.sample_iteration)

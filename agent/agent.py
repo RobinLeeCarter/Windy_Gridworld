@@ -17,11 +17,16 @@ class Agent:
         self.action: Optional[environment.Action] = None
         self.reward: Optional[float] = None
         self.response: Optional[environment.Response] = None
+        self.t: Optional[int] = None
 
     def set_policy(self, policy_: policy.Policy):
         self.policy = policy_
 
     def start_episode(self):
+        """Gets initial state S0.
+        Choose initial action A0.
+        Records S0 and A0 but does not take action."""
+        self.t = 0
         if self.verbose:
             print("start episode...")
         self.episode = episode.Episode()
@@ -31,19 +36,24 @@ class Agent:
         self._update_from_response()
         self._add_episode_rsa()
 
-    def take_step(self):
-        #  state and action already set
+    def take_action(self):
+        """State and action are already set, make a copy in previous_rsa before updating.
+        Perform action.
+        Get new reward and state in response.
+        Update current values including new action.
+        Record new reward, state and action in episode.
+        """
         if self.state.is_terminal:
             raise Exception("Trying to act in terminal state.")
-        self.response = self.environment.apply_action_to_state(self.state, self.action)
-        self._update_from_response()
         self.previous_rsa = self.episode.rsa
+        self.response = self.environment.from_state_perform_action(self.state, self.action)
+        self._update_from_response()
         self._add_episode_rsa()
 
-    def get_sarsa(self) -> sarsa.SARSA:
+    def get_sarsa(self) -> sarsa.Sarsa:
         if self.previous_rsa is None:
             raise Exception("Trying to get_sarsa with no previous_rsa.")
-        sarsa_ = sarsa.SARSA(
+        sarsa_ = sarsa.Sarsa(
             state=self.previous_rsa.state,
             action=self.previous_rsa.action,
             reward=self.previous_rsa.reward,
@@ -57,12 +67,13 @@ class Agent:
         self.episode.add_rsa()
 
     def _update_from_response(self):
+        self.t += 1
         self.reward = self.response.reward
         self.state = self.response.state
         if self.state.is_terminal:
             self.action = None
         else:
-            self.action = self.policy.get_action_given_state(self.state)
+            self.action = self.policy[self.state]
         if self.verbose:
             print("start episode:")
             print(f"state = {self.state} \t action = {self.action}")
@@ -74,10 +85,10 @@ class Agent:
         self.state = response.state
 
         while not self.state.is_terminal:
-            self.action = self.policy.get_action_given_state(self.state)
+            self.action = self.policy[self.state]
             if self.verbose:
                 print(f"state = {self.state} \t action = {self.action}")
-            self.response = self.environment.apply_action_to_state(self.state, self.action)
+            self.response = self.environment.from_state_perform_action(self.state, self.action)
             episode_.add_monte_carlo_style(self.state, self.action, self.response.reward)
             self.state = self.response.state
         episode_.add_terminal(self.state)

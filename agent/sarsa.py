@@ -5,7 +5,7 @@ import environment
 
 
 @dataclass
-class SARSA:
+class Sarsa:
     state: environment.State
     action: environment.Action
     reward: float

@@ -17,3 +17,10 @@ class Episode:
         self.rsa = rsa.RSA(reward, state, action)
         # S0, A0, R1, S1, A1, R2 ... S(T-1), A(T-1), R(T)
         self.trajectory.append(self.rsa)
+
+    @property
+    def max_t(self) -> int:
+        if self.trajectory:
+            return len(self.trajectory) - 1
+        else:
+            return 0

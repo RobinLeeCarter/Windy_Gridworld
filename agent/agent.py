@@ -79,7 +79,7 @@ class Agent:
             print("start episode:")
             print(f"state = {self.state} \t action = {self.action}")
 
-    def generate_episode(self) -> episode.Episode:
+    def generate_episode(self):
         self.start_episode()
         while not self.state.is_terminal and self.t < 10000:
             if self.verbose:
@@ -89,7 +89,6 @@ class Agent:
             print("Failed to terminate")
         if self.verbose:
             print(f"t={self.t} \t state = {self.state} (terminal)")
-        return self.episode
 
     # def generate_episode(self) -> episode.Episode:
     #     episode_: episode.Episode = episode.Episode()

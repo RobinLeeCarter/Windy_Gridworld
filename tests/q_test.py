@@ -17,6 +17,7 @@ def q_test() -> bool:
     action_ = environment.Action(common.XY(x=1, y=0))
     print(q[state_, action_])
     q[state_, action_] = 2.0
+    q[state_, action_] += 0.5
     print(q[state_, action_])
 
     return True

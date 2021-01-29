@@ -33,7 +33,7 @@ class Controller:
                 self.environment,
                 self.agent,
                 alpha=constants.ALPHA,
-                verbose=self.verbose
+                verbose=False
             )
         self.view = view.View(self.environment.grid_world)
 

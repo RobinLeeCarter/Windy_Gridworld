@@ -9,16 +9,14 @@ class DeterministicPolicy(policy.Policy):
         super().__init__(environment_)
         self._action_given_state: np.ndarray = np.empty(shape=self.environment.states_shape, dtype=environment.Action)
 
-    def set_action(self, state_: environment.State, action_: environment.Action):
-        self._action_given_state[state_.index] = action_
+    def __getitem__(self, state: environment.State) -> environment.Action:
+        return self._action_given_state[state.index]
 
-    def get_action_given_state(self, state_: environment.State) -> environment.Action:
-        action_ = self._action_given_state[state_.index]
-        return action_
+    def __setitem__(self, state: environment.State, action: environment.Action):
+        self._action_given_state[state.index] = action
 
     def get_probability(self, state_: environment.State, action_: environment.Action) -> float:
-        deterministic_action = self.get_action_given_state(state_)
-        if action_ == deterministic_action:
+        if action_ == self[state_]:
             return 1.0
         else:
             return 0.0

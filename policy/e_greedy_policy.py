@@ -11,23 +11,21 @@ class EGreedyPolicy(policy.RandomPolicy):
         self.greedy_policy: policy.DeterministicPolicy = greedy_policy
         self.epsilon = epsilon
 
-    def set_greedy_action(self, state_: environment.State, action_: environment.Action):
-        self.greedy_policy.set_action(state_, action_)
-
-    def get_action_given_state(self, state_: environment.State) -> environment.Action:
+    def __getitem__(self, state: environment.State) -> environment.Action:
         if self.rng.uniform() > self.epsilon:
-            return self.greedy_policy.get_action_given_state(state_)
+            return self.greedy_policy[state]
         else:
-            return policy.RandomPolicy.get_action_given_state(self, state_)
-            # policy.RandomPolicy.get_action_given_state(self, state_)
+            return policy.RandomPolicy.__getitem__(self, state)
             # self.set_possible_actions(state_)
             # return self.rng.choice(self.possible_actions)
+
+    def __setitem__(self, state: environment.State, action: environment.Action):
+        self.greedy_policy[state] = action
 
     def get_probability(self, state_: environment.State, action_: environment.Action) -> float:
         self.set_possible_actions(state_)
         non_greedy_p = self.epsilon * (1.0 / len(self.possible_actions))
-        greedy_action = self.greedy_policy.get_action_given_state(state_)
-        if action_ == greedy_action:
+        if action_ == self.greedy_policy[state_]:
             greedy_p = (1 - self.epsilon) + non_greedy_p
             return greedy_p
         else:

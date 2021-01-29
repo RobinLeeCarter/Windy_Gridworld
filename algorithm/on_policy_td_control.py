@@ -6,6 +6,7 @@ import constants
 import environment
 import policy
 import agent
+from algorithm import state_action_function
 
 
 class OnPolicyTdControl:
@@ -18,16 +19,13 @@ class OnPolicyTdControl:
                  ):
         self.environment: environment.Environment = environment_
         self.agent: agent.Agent = agent_
-        assert isinstance(self.agent.policy, policy.EGreedyPolicy),\
-            "agent.policy not EGreedyPolicy"
+        assert isinstance(self.agent.policy, policy.EGreedyPolicy), "agent.policy not EGreedyPolicy"
         self.policy: policy.EGreedyPolicy = self.agent.policy
         self.gamma = gamma
         self.alpha = alpha
         self.verbose = verbose
 
-        q_shape = self.environment.states_shape + self.environment.actions_shape
-        self.Q: np.ndarray = np.zeros(shape=q_shape, dtype=float)
-        self.initialise_q()
+        self.Q = state_action_function.StateActionFunction(self.environment)
         self.initialise_policy()
         self.learning_iteration: int = 0
 
@@ -36,50 +34,11 @@ class OnPolicyTdControl:
         # self.average_return: np.ndarray = np.zeros(shape=samples+1, dtype=float)
         # self.average_return[0] = constants.INITIAL_Q_VALUE*2
 
-    def initialise_q(self):
-        # incompatible actions must never be selected
-        self.Q.fill(np.NINF)
-        # so that a successful trajectory is always better
-        for state_ in self.environment.states():
-            for action_ in self.environment.actions_for_state(state_):
-                q_index = state_.index + action_.index
-                if state_.is_terminal:
-                    self.Q[q_index] = 0.0
-                else:
-                    self.Q[q_index] = constants.INITIAL_Q_VALUE
-
     def initialise_policy(self):
         for state_ in self.environment.states():
-            target_action = self.consistent_argmax_q(state_)
+            # self.policy[state_] = self.Q.state_argmax(state_)
+            target_action = self.Q.state_argmax(state_)
             self.policy.set_greedy_action(state_, target_action)
-
-    def consistent_argmax_q(self, state_: environment.State) -> environment.Action:
-        """set target_policy to argmax over a of Q breaking ties consistently"""
-        # state_index = self.get_index_from_state(state_)
-        # print(f"state_index {state_index}")
-        q_slice = state_.index + np.s_[:]
-        q_state: np.ndarray = self.Q[q_slice]
-        # print(f"q_state.shape {q_state.shape}")
-
-        # argmax
-        best_q: float = np.max(q_state)
-        # print(f"best_q {best_q}")
-        best_q_bool: np.ndarray = (q_state == best_q)
-        # print(f"best_q_bool.shape {best_q_bool.shape}")
-        best_flat_indexes: np.ndarray = np.flatnonzero(best_q_bool)
-        consistent_best_flat_index: int = best_flat_indexes[0]
-        # print(f"consistent_best_flat_index {consistent_best_flat_index}")
-        unravelled_index: tuple[np.ndarray] = np.unravel_index(consistent_best_flat_index, shape=q_state.shape)
-        # unravelled_index actually returns tuple[np.int64]
-        assert np.isscalar(unravelled_index[0])
-        best_index: tuple[int] = tuple([int(i) for i in unravelled_index])
-
-        # unravelled_index: tuple = best_index_tuple_array[0][0]
-        # print(f"unravelled_index {unravelled_index}")
-        best_action = environment.Actions.get_action_from_index(best_index)
-        # best_action = self.get_action_from_index(unravelled_index)
-        # print(f"best_action {best_action}")
-        return best_action
 
     # noinspection PyPep8Naming
     def run(self):

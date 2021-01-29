@@ -3,7 +3,6 @@ import numpy as np
 
 import common
 from environment import action, response, state, grid
-import action_explore
 
 
 class Environment:
@@ -11,8 +10,6 @@ class Environment:
         self.rng: np.random.Generator = rng
         self.verbose: bool = verbose
         self.grid_world: grid.GridWorld = grid.GridWorld(grid_, rng)
-        a = action_explore.Actions._test_action
-        b = action_explore._test_action2
 
         # position
         self.min_x: int = 0
@@ -20,23 +17,11 @@ class Environment:
         self.min_y: int = 0
         self.max_y: int = self.grid_world.grid.max_y
 
-        # # velocity
-        # self.min_vx: int = 0
-        # self.max_vx: int = constants.MAX_VELOCITY
-        # self.min_vy: int = 0
-        # self.max_vy: int = constants.MAX_VELOCITY
-        #
-        # # acceleration
-        # self.min_ax: int = constants.MIN_ACCELERATION
-        # self.max_ax: int = constants.MAX_ACCELERATION
-        # self.min_ay: int = constants.MIN_ACCELERATION
-        # self.max_ay: int = constants.MAX_ACCELERATION
-
         self.states_shape: tuple = (self.max_x + 1, self.max_y + 1)
-        self.action_list: List[action.Action] = [action_ for action_ in self.actions()]
-        self.action_dict: Dict[action.Action, int] = {action_: i for i, action_ in enumerate(self.actions())}
+        # self.action_list: List[action.Action] = [action_ for action_ in self.actions()]
+        # self.action_dict: Dict[action.Action, int] = {action_: i for i, action_ in enumerate(self.actions())}
         # actions = [action_ for action_ in self.actions()]
-        self.actions_shape: tuple = (len(self.action_dict), )
+        self.actions_shape: tuple = action.Actions.shape
         # self.trace_ = grid.Trace = grid.Trace(self.grid_world)
 
         # pre-reset state (if not None it means the state has just been reset and this was the failure state)
@@ -52,25 +37,20 @@ class Environment:
                 yield state.State(position, is_terminal)
 
     def actions(self) -> Generator[action.Action, None, None]:
-        """set A - same for all s"""
-        # left
-        yield action.Action(move=common.XY(x=-1, y=0))
-        # right
-        yield action.Action(move=common.XY(x=+1, y=0))
-        # up
-        yield action.Action(move=common.XY(x=0, y=+1))
-        # down
-        yield action.Action(move=common.XY(x=0, y=-1))
+        """set A - same for all s in this scenario"""
+        for action_ in action.Actions.action_list:
+            yield action_
 
-    def get_index_from_action(self, action_: action.Action) -> tuple[int]:
-        tuple_index = (self.action_dict[action_], )
-        return tuple_index
+    # def get_index_from_action(self, action_: action.Action) -> tuple[int]:
+    #     tuple_index = (self.action_dict[action_], )
+    #     return tuple_index
 
-    def get_action_from_index(self, index: int) -> action.Action:
-        action_ = self.action_list[index]
-        return action_
+    # def get_action_from_index(self, index: int) -> action.Action:
+    #     action_ = self.action_list[index]
+    #     return action_
 
     # possible need to materialise this if it's slow since it will be at the bottom of the loop
+    # noinspection PyUnusedLocal
     def actions_for_state(self, state_: state.State) -> Generator[action.Action, None, None]:
         """set A(s)"""
         for action_ in self.actions():

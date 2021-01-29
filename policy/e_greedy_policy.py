@@ -1,5 +1,3 @@
-from typing import Optional, List
-
 import numpy as np
 
 import environment

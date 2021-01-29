@@ -42,8 +42,7 @@ class OnPolicyTdControl:
         # so that a successful trajectory is always better
         for state_ in self.environment.states():
             for action_ in self.environment.actions_for_state(state_):
-                action_index: tuple[int] = self.environment.get_index_from_action(action_)
-                q_index = state_.index + action_index
+                q_index = state_.index + action_.index
                 if state_.is_terminal:
                     self.Q[q_index] = 0.0
                 else:
@@ -53,6 +52,34 @@ class OnPolicyTdControl:
         for state_ in self.environment.states():
             target_action = self.consistent_argmax_q(state_)
             self.policy.set_greedy_action(state_, target_action)
+
+    def consistent_argmax_q(self, state_: environment.State) -> environment.Action:
+        """set target_policy to argmax over a of Q breaking ties consistently"""
+        # state_index = self.get_index_from_state(state_)
+        # print(f"state_index {state_index}")
+        q_slice = state_.index + np.s_[:]
+        q_state: np.ndarray = self.Q[q_slice]
+        # print(f"q_state.shape {q_state.shape}")
+
+        # argmax
+        best_q: float = np.max(q_state)
+        # print(f"best_q {best_q}")
+        best_q_bool: np.ndarray = (q_state == best_q)
+        # print(f"best_q_bool.shape {best_q_bool.shape}")
+        best_flat_indexes: np.ndarray = np.flatnonzero(best_q_bool)
+        consistent_best_flat_index: int = best_flat_indexes[0]
+        # print(f"consistent_best_flat_index {consistent_best_flat_index}")
+        unravelled_index: tuple[np.ndarray] = np.unravel_index(consistent_best_flat_index, shape=q_state.shape)
+        # unravelled_index actually returns tuple[np.int64]
+        assert np.isscalar(unravelled_index[0])
+        best_index: tuple[int] = tuple([int(i) for i in unravelled_index])
+
+        # unravelled_index: tuple = best_index_tuple_array[0][0]
+        # print(f"unravelled_index {unravelled_index}")
+        best_action = environment.Actions.get_action_from_index(best_index)
+        # best_action = self.get_action_from_index(unravelled_index)
+        # print(f"best_action {best_action}")
+        return best_action
 
     # noinspection PyPep8Naming
     def run(self):
@@ -115,26 +142,3 @@ class OnPolicyTdControl:
     #         sample_iteration += 1
     #     self.sample_iteration[sample_number] = self.learning_iteration
     #     self.average_return[sample_number] = average_G
-
-    def consistent_argmax_q(self, state_: environment.State) -> environment.Action:
-        """set target_policy to argmax over a of Q breaking ties consistently"""
-        # state_index = self.get_index_from_state(state_)
-        # print(f"state_index {state_index}")
-        state_slice_tuple = state_.index + np.s_[:, :]
-        q_slice: np.ndarray = self.Q[state_slice_tuple]
-        # print(f"q_slice.shape {q_slice.shape}")
-
-        # argmax
-        best_q = np.max(q_slice)
-        # print(f"best_q {best_q}")
-        best_q_bool = (q_slice == best_q)
-        # print(f"best_q_bool.shape {best_q_bool.shape}")
-        best_flat_indexes = np.flatnonzero(best_q_bool)
-        consistent_best_flat_index = best_flat_indexes[0]
-        # print(f"consistent_best_flat_index {consistent_best_flat_index}")
-        # best_index = np.unravel_index(consistent_best_flat_index, shape=q_slice.shape)
-        # print(f"best_index {best_index}")
-        best_action = self.environment.get_action_from_index(consistent_best_flat_index)
-        # best_action = self.get_action_from_index(best_index)
-        # print(f"best_action {best_action}")
-        return best_action

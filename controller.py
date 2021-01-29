@@ -7,7 +7,7 @@ import constants
 import environment
 import policy
 import agent
-import on_policy_td_control
+from algorithm import on_policy_td_control
 import view
 
 

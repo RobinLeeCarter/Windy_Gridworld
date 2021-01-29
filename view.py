@@ -33,7 +33,7 @@ class View:
         self.episode: Optional[agent.Episode] = None
 
         self._build_color_lookup()
-        self._load_racetrack()
+        self._load_gridworld()
 
     @property
     def screen_size(self) -> tuple:
@@ -86,13 +86,13 @@ class View:
             common.Square.AGENT: pygame.Color('deepskyblue2')
         }
 
-    def _load_racetrack(self):
+    def _load_gridworld(self):
         self._set_sizes()
         self._grid_surface.fill(self._background_color)
         for x in range(self._max_x + 1):
             for y in range(self._max_y + 1):
                 square: common.Square = self._grid_world.get_square(position=(x, y))
-                self._draw_square(row=y, col=x, square=square, surface=self._grid_surface)
+                self._draw_square(x, y, square, self._grid_surface)
         self._copy_track_into_background()
 
     def _copy_track_into_background(self):
@@ -108,7 +108,10 @@ class View:
         self._background = pygame.Surface(size=self.screen_size)
         self._grid_surface = pygame.Surface(size=self.screen_size)
 
-    def _draw_square(self, row: int, col: int, square: common.Square, surface: pygame.Surface) -> pygame.Rect:
+    def _draw_square(self, x: int, y: int, square: common.Square, surface: pygame.Surface) -> pygame.Rect:
+        row = self._max_y - y
+        col = x
+
         color: pygame.Color = self._color_lookup[square]
         left: int = col * self._cell_pixels
         top: int = row * self._cell_pixels
@@ -148,7 +151,7 @@ class View:
     def _draw_agent_at_state(self, state: environment.State):
         # row, col = self._grid_world.get_index(state.x, state.y)
         # print(f"t={self.t} x={state.x} y={state.y} row={row} col={col}")
-        rect: pygame.Rect = self._draw_square(row=state.position.y, col=state.position.x,
+        rect: pygame.Rect = self._draw_square(x=state.position.x, y=state.position.y,
                                               square=common.Square.AGENT, surface=self._background)
         self._screen.blit(source=self._background, dest=rect, area=rect)
         pygame.display.update(rect)

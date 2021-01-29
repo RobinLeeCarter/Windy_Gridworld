@@ -16,7 +16,7 @@ class Controller:
         self.verbose: bool = verbose
 
         self.rng: np.random.Generator = np.random.default_rng()
-        self.environment = environment.Environment(constants.GRID, self.rng, verbose=True)
+        self.environment = environment.Environment(constants.GRID, self.rng, verbose=False)
         self.greedy_policy: policy.DeterministicPolicy = policy.DeterministicPolicy(self.environment)
         self.e_greedy_policy: policy.EGreedyPolicy = policy.EGreedyPolicy(self.environment, self.rng,
                                                                           greedy_policy=self.greedy_policy)
@@ -33,7 +33,7 @@ class Controller:
                 self.environment,
                 self.agent,
                 alpha=constants.ALPHA,
-                verbose=True
+                verbose=False
             )
         self.view = view.View(self.environment.grid_world)
 
@@ -49,7 +49,8 @@ class Controller:
         # self.environment.verbose = True
         # self.agent.verbose = True
 
-        self.agent.verbose = True
+        # self.agent.verbose = True
+        # self.agent.set_policy(self.greedy_policy)
         while True:
             episode_: agent.Episode = self.agent.generate_episode()
             user_event: common.UserEvent = self.view.display_episode(episode_)

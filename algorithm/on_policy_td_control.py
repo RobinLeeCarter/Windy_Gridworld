@@ -41,7 +41,7 @@ class OnPolicyTdControl:
             if self.verbose:
                 print(f"iteration = {self.learning_iteration}")
             else:
-                if self.learning_iteration % 100 == 0:
+                if self.learning_iteration % 1000 == 0:
                     print(f"iteration = {self.learning_iteration}")
             # if self.learning_iteration >= constants.PERFORMANCE_SAMPLE_START and \
             #         self.learning_iteration % constants.PERFORMANCE_SAMPLE_FREQUENCY == 0:

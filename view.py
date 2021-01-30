@@ -58,22 +58,21 @@ class View:
             self._wait_for_event_of_interest()
             self._handle_event()
 
-    def display_episode(self, episode_: agent.Episode) -> common.UserEvent:
+    def display_episode(self, episode_: agent.Episode, show_trail: bool = True) -> common.UserEvent:
         # print(episode_.trajectory)
         # print(f"len(self.episode.trajectory) = {len(episode_.trajectory)}")
-        self._copy_track_into_background()
+        self._copy_grid_into_background()
         self._put_background_on_screen()
         self.episode = episode_
         self.t = 0
-        terminal = len(self.episode.trajectory) - 1  # terminal state
-        while self._user_event != common.UserEvent.QUIT and self.t <= terminal:
+        while self._user_event != common.UserEvent.QUIT and self.t <= self.episode.max_t:
             # need to pass through for terminal state to display penultimate state
             # keys = pygame.key.get_pressed()
             # if keys[pygame.K_SPACE]:
             #     self.user_event = enums.enums.UserEvent.SPACE
             # else:
             self._wait_for_event_of_interest()
-            self._handle_event()
+            self._handle_event(show_trail)
         return self._user_event
 
     # noinspection SpellCheckingInspection
@@ -93,9 +92,9 @@ class View:
             for y in range(self._max_y + 1):
                 square: common.Square = self._grid_world.get_square(position=(x, y))
                 self._draw_square(x, y, square, self._grid_surface)
-        self._copy_track_into_background()
+        self._copy_grid_into_background()
 
-    def _copy_track_into_background(self):
+    def _copy_grid_into_background(self):
         self._background.blit(source=self._grid_surface, dest=(0, 0))
 
     def _set_sizes(self):
@@ -137,14 +136,16 @@ class View:
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 self._user_event = common.UserEvent.SPACE
 
-    def _handle_event(self):
+    def _handle_event(self, show_trail: bool = True):
         if self._user_event == common.UserEvent.QUIT:
             self.close_window()
             # sys.exit()
         elif self._user_event == common.UserEvent.SPACE:
+            if not show_trail:
+                self._copy_grid_into_background()
+                self._put_background_on_screen()
             state: environment.State = self.episode.trajectory[self.t].state
-            if not state.is_terminal:
-                self._draw_agent_at_state(state)
+            self._draw_agent_at_state(state)
             self.t += 1
             # self.draw_random_car()
 

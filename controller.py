@@ -50,11 +50,11 @@ class Controller:
         # self.agent.verbose = True
 
         # self.agent.verbose = True
-        self.agent.set_policy(self.greedy_policy)
+        # self.agent.set_policy(self.greedy_policy)
         while True:
             self.agent.generate_episode()
             print(f"max_t: {self.agent.episode.max_t}")
-            user_event: common.UserEvent = self.view.display_episode(self.agent.episode)
+            user_event: common.UserEvent = self.view.display_episode(self.agent.episode, show_trail=False)
             if user_event == common.UserEvent.QUIT:
                 break
 

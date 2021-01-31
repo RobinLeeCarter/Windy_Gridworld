@@ -2,7 +2,7 @@ from typing import Generator
 import numpy as np
 
 import common
-from environment import action, response, state, grid
+from environment import action, observation, state, grid
 
 
 class Environment:
@@ -69,17 +69,17 @@ class Environment:
     # endregion
 
     # region Operation
-    def start(self) -> response.Response:
+    def start(self) -> observation.Observation:
         state_ = self.get_a_start_state()
         # if self.verbose:
         #     self.trace_.start(state_)
-        return response.Response(state=state_, reward=None)
+        return observation.Observation(state=state_, reward=None)
 
     def get_a_start_state(self) -> state.State:
         position: common.XY = self.grid_world.get_a_start_position()
         return state.State(position)
 
-    def from_state_perform_action(self, state_: state.State, action_: action.Action) -> response.Response:
+    def from_state_perform_action(self, state_: state.State, action_: action.Action) -> observation.Observation:
         # if not self.is_action_compatible_with_state(state_, action_):
         #     raise Exception(f"from_state_perform_action state {state_} incompatible with action {action_}")
 
@@ -96,7 +96,7 @@ class Environment:
         is_terminal: bool = self.grid_world.is_at_goal(projected_position)
         new_state: state.State = state.State(projected_position, is_terminal)
         reward: float = -1.0
-        return response.Response(reward, new_state)
+        return observation.Observation(reward, new_state)
 
     def _project_back_to_grid(self, blown_position: common.XY) -> common.XY:
         x = blown_position.x

@@ -16,7 +16,7 @@ class Agent:
         self.state: Optional[environment.State] = None
         self.action: Optional[environment.Action] = None
         self.reward: Optional[float] = None
-        self.response: Optional[environment.Response] = None
+        self.response: Optional[environment.Observation] = None
         self.t: Optional[int] = None
 
     def set_policy(self, policy_: policy.Policy):

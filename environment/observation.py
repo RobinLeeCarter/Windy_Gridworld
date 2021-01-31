@@ -6,6 +6,6 @@ from environment import state
 
 
 @dataclass(frozen=True)
-class Response:
+class Observation:
     reward: Optional[float]
     state: state.State
